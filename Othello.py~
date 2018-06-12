@@ -157,7 +157,6 @@ while not done:
 			turn = 2
 		else:
 			turn = 1
-	print "turn", turn
 	while not success:
 		pos = raw_input().split()
 		try:
@@ -168,6 +167,7 @@ while not done:
 		if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or board[pos[0]][pos[1]] != 0:#position occupied or out of range
 			print "illegal move"
 		else:
+			print "turn", turn
 			result = check(pos[0], pos[1], turn, 0)
 			if result == 1:
 				black, white = 0, 0
