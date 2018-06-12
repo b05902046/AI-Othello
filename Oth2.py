@@ -174,9 +174,9 @@ X = [1, 1, 0, -1, -1, -1, 0, 1]
 Y = [0, -1, -1, -1, 0, 1, 1, 1]
 COLOR = (BROWN, BLACK, WHITE)
 class gameState:
-	def __init__(self, prevState = None):
-		if prevState != None:
-			self.board = prevState.board
+	def __init__(self, prevBoard = None):
+		if prevBoard != None:
+			self.board = [x for x in prevBoard]
 		else:
 			self.board = [[0, 0, 0, 0, 0, 0, 0, 0, 0] for i in range(9)]
 			self.board[4][4] = 2
@@ -290,7 +290,7 @@ class gameState:
 		return moves
 
 	def get_successor_state(self, myColor, i, j):
-		successor = gameState(self)
+		successor = gameState(self.board)
 		successor.check(i, j, myColor, 0)
 		return successor
 
@@ -317,12 +317,12 @@ def naiive_get_best_move(currentState, myColor):
 	return [maxi, maxj]
 
 def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
+	print "depth", depth, "myColor", myColor
+	currentState.print_board()
 	if depth == limit_depth:
 		value = currentState.evaluate(priceTable)
 		print (depth, None, None, value)
 		return (None, None, value)
-	print (depth, myColor)
-	currentState.print_board()
 	moves = currentState.get_legal_moves(myColor, True)
 	if warn == True:
 		if moves == None:
@@ -346,6 +346,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		MIN, mini, minj = 10000000000, None, None
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
+			print newState.board is currentState.board
 			new = min_max_get_best_move(priceTable, newState, 1, depth+1, False)
 			if new[2] < MIN:
 				MIN, mini, minj = new[2], move[0], move[1]
