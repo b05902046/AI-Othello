@@ -1,9 +1,13 @@
 import pygame
+import time
 GREEN = (0, 153, 51)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BROWN = (237, 217, 177)
 BASE = 2#position of up-left corner
+#=======limits=======#
+limit_depth = 5
+
 class game:
 	def __init__(self):
 #init screen
@@ -116,23 +120,25 @@ class game:
 		return black + white
 
 	def handle(self):
-		while not Game.get_done():
+		while not self.get_done():
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
-					Game.set_done(True)
+					self.set_done(True)
 			success = False
-			Game.read_price_table()
+			self.read_price_table()
 			if self.origin_board.haveMove(self.turn) == -1:
-				Game.next_turn()
+				self.next_turn()
 				if self.origin_board.haveMove(self.turn) == -1:
 					#game ends
 					self.get_winner(self.origin_board.count_wb())
 
 			while not success:
-				if Game.get_turn() == 2:
+				if self.get_turn() == 2:
 					print "Computer's turn"
-					pos = naiive_get_best_move(self.origin_board, 2)
+					#pos = naiive_get_best_move(self.origin_board, 2)
+					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1)
 					print "AI chose", pos
+					time.sleep(5)
 				else:
 					pos = raw_input().split()
 				try:
@@ -269,7 +275,7 @@ class gameState:
 						continue
 		return ret
 
-	def get_legal_moves(self, myColor):
+	def get_legal_moves(self, myColor, flag):
 		moves = []
 		for i in range(1, 9):
 			for j in range(1, 9):
@@ -278,8 +284,9 @@ class gameState:
 					if result > 0:
 						moves += [[i, j, result]]
 	        #[x, y, score]
-		print "Possible moves:"
-		print moves
+		if flag == True:
+			print "Possible moves:"
+			print moves
 		return moves
 
 	def get_successor_state(self, myColor, i, j):
@@ -288,20 +295,51 @@ class gameState:
 		return successor
 
 	def haveMove(self, myColor):
-		if len(self.get_legal_moves(myColor)) > 0:
+		if len(self.get_legal_moves(myColor, True)) > 0:
 			return 1
 		return -1
+	def evaluate(self, priceTable):
+		value = 0
+		for i in range(1, 9):
+			for j in range(1, 9):
+				if self.board[i][j] == 1:
+					value += priceTable[i][j]
+				elif self.board[i][j] == 2:
+					value -= priceTable[i][j]
+		return value
 
 def naiive_get_best_move(currentState, myColor):
 	max, maxi, maxj = -1, -1, -1
-	moves = currentState.get_legal_moves(myColor)
+	moves = currentState.get_legal_moves(myColor, True)
 	for [i, j, score] in moves:
 		if max < score:
 			max, maxi, maxj = score, i, j
 	return [maxi, maxj]
 
-def min_max_get_best_move(myColor):
-	return
+def min_max_get_best_move(priceTable, currentState, myColor, depth):
+	if depth == limit_depth:
+		return (depth, None, None, currentState.evaluate(priceTable))
+	moves = currentState.get_legal_moves(myColor, True)
+	
+	if myColor == 1:
+		#black
+		MAX, maxi, maxj = -10000000000, None, None
+		for move in moves:
+			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 2, depth+1)
+			if new[2] > MAX:
+				MAX, maxi, maxj = new[2], move[0], move[1]
+		print(depth, maxi, maxj, MAX)
+		return (maxi, maxj, MAX)
+	elif myColor == 2:
+		#white
+		MIN, mini, minj = 10000000000, None, None
+		for move in moves:
+			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 1, depth+1)
+			if new[2] < MIN:
+				MIN, mini, minj = new[2], move[0], move[1]
+		print (depth, mini, minj, MIN)
+		return (mini, minj, MIN)
+
 """=======================================added==================================="""
 
 

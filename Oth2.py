@@ -176,7 +176,10 @@ COLOR = (BROWN, BLACK, WHITE)
 class gameState:
 	def __init__(self, prevState = None):
 		if prevState != None:
-			self.board = prevState.board
+			self.board = []
+			for x in prevState.board:
+				self.board.append(x)
+			print self.board is prevState
 		else:
 			self.board = [[0, 0, 0, 0, 0, 0, 0, 0, 0] for i in range(9)]
 			self.board[4][4] = 2
@@ -318,8 +321,12 @@ def naiive_get_best_move(currentState, myColor):
 
 def min_max_get_best_move(priceTable, currentState, myColor, depth):
 	if depth == limit_depth:
+		print "EVAL", currentState.evaluate(priceTable)
 		return (depth, None, None, currentState.evaluate(priceTable))
 	moves = currentState.get_legal_moves(myColor, True)
+	print "depth", depth, "turn", myColor
+	print "before"
+	currentState.print_board()
 	if myColor == 1:
 		#black
 		MAX, maxi, maxj = -10000000000, None, None
@@ -327,7 +334,9 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth):
 			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 2, depth+1)
 			if new[2] > MAX:
 				MAX, maxi, maxj = new[2], move[0], move[1]
-		print(depth, maxi, maxj, MAX)
+		print "score", MAX
+		print "after"
+		currentState.print_board()
 		return (maxi, maxj, MAX)
 	elif myColor == 2:
 		#white
@@ -336,7 +345,9 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth):
 			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 1, depth+1)
 			if new[2] < MIN:
 				MIN, mini, minj = new[2], move[0], move[1]
-		print (depth, mini, minj, MIN)
+		print "score", MIN
+		print "after 2"
+		currentState.print_board()
 		return (mini, minj, MIN)
 
 """=======================================added==================================="""
