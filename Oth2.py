@@ -133,19 +133,20 @@ class game:
 					self.get_winner(self.origin_board.count_wb())
 
 			while not success:
+				pos = None
 				if self.get_turn() == 2:
 					print "Computer's turn"
 					#pos = naiive_get_best_move(self.origin_board, 2)
-					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1)
+					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1, False)
 					print "AI chose", pos
-					time.sleep(5)
+					time.sleep(2)
 				else:
 					pos = raw_input().split()
-				try:
-					pos[0], pos[1] = int(pos[0]), int(pos[1])
-				except:
-					print "Wrong input format"
-					continue
+					try:
+						pos[0], pos[1] = int(pos[0]), int(pos[1])
+					except:
+						print "Wrong input format"
+						continue
 				if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or self.origin_board.occupation(pos[0], pos[1]):#position occupied or out of range
 					print "illegal move"
 				else:
@@ -174,12 +175,14 @@ X = [1, 1, 0, -1, -1, -1, 0, 1]
 Y = [0, -1, -1, -1, 0, 1, 1, 1]
 COLOR = (BROWN, BLACK, WHITE)
 class gameState:
-	def __init__(self, prevState = None):
-		if prevState != None:
-			self.board = []
-			for x in prevState.board:
-				self.board.append(x)
-			print self.board is prevState
+	def __init__(self, prevBoard = None):
+		if prevBoard != None:
+			self.board = [ [0, 0, 0, 0, 0, 0, 0, 0, 0]  for x in range(0, 9)]
+			for row in range(1,9):
+				for column in range(1,9):
+					self.board[row][column] = prevBoard[row][column]
+			#print self.board[0] is prevBoard[0]
+
 		else:
 			self.board = [[0, 0, 0, 0, 0, 0, 0, 0, 0] for i in range(9)]
 			self.board[4][4] = 2
@@ -293,7 +296,7 @@ class gameState:
 		return moves
 
 	def get_successor_state(self, myColor, i, j):
-		successor = gameState(self)
+		successor = gameState(self.board)
 		successor.check(i, j, myColor, 0)
 		return successor
 
@@ -319,35 +322,46 @@ def naiive_get_best_move(currentState, myColor):
 			max, maxi, maxj = score, i, j
 	return [maxi, maxj]
 
-def min_max_get_best_move(priceTable, currentState, myColor, depth):
+def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
+	#print "depth", depth, "myColor", myColor
+	#currentState.print_board()
 	if depth == limit_depth:
-		print "EVAL", currentState.evaluate(priceTable)
-		return (depth, None, None, currentState.evaluate(priceTable))
+		value = currentState.evaluate(priceTable)
+		#print (depth, None, None, value)
+		return (None, None, value)
 	moves = currentState.get_legal_moves(myColor, True)
-	print "depth", depth, "turn", myColor
-	print "before"
-	currentState.print_board()
+	if warn == True:
+		if moves == None:
+			value = currentState.evaluate(priceTable)
+			#print (depth, None, None, value)
+			return (None, None, value)
+	elif moves == None:
+		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, True)
 	if myColor == 1:
 		#black
 		MAX, maxi, maxj = -10000000000, None, None
 		for move in moves:
-			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 2, depth+1)
+			newState = currentState.get_successor_state(myColor, move[0], move[1])
+			new = min_max_get_best_move(priceTable, newState, 2, depth+1, False)
 			if new[2] > MAX:
 				MAX, maxi, maxj = new[2], move[0], move[1]
-		print "score", MAX
-		print "after"
-		currentState.print_board()
+		#print "score", MAX
+		#print "after"
+		#currentState.print_board()
 		return (maxi, maxj, MAX)
 	elif myColor == 2:
 		#white
 		MIN, mini, minj = 10000000000, None, None
 		for move in moves:
-			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 1, depth+1)
+			newState = currentState.get_successor_state(myColor, move[0], move[1])
+			#print "new"
+			#currentState.print_board()
+			new = min_max_get_best_move(priceTable, newState, 1, depth+1, False)
 			if new[2] < MIN:
 				MIN, mini, minj = new[2], move[0], move[1]
-		print "score", MIN
-		print "after 2"
-		currentState.print_board()
+		#print "score", MIN
+		#print "after 2"
+		#currentState.print_board()
 		return (mini, minj, MIN)
 
 """=======================================added==================================="""
