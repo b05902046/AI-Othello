@@ -136,7 +136,7 @@ class game:
 				if self.get_turn() == 2:
 					print "Computer's turn"
 					#pos = naiive_get_best_move(self.origin_board, 2)
-					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1)
+					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1, False)
 					print "AI chose", pos
 					time.sleep(5)
 				else:
@@ -316,15 +316,27 @@ def naiive_get_best_move(currentState, myColor):
 			max, maxi, maxj = score, i, j
 	return [maxi, maxj]
 
-def min_max_get_best_move(priceTable, currentState, myColor, depth):
+def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 	if depth == limit_depth:
-		return (depth, None, None, currentState.evaluate(priceTable))
+		value = currentState.evaluate(priceTable)
+		print (depth, None, None, value)
+		return (None, None, value)
+	print (depth, myColor)
+	currentState.print_board()
 	moves = currentState.get_legal_moves(myColor, True)
+	if warn == True:
+		if moves == None:
+			value = currentState.evaluate(priceTable)
+			print (depth, None, None, value)
+			return (None, None, value)
+	elif moves == None:
+		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, True)
 	if myColor == 1:
 		#black
 		MAX, maxi, maxj = -10000000000, None, None
 		for move in moves:
-			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 2, depth+1)
+			newState = currentState.get_successor_state(myColor, move[0], move[1])
+			new = min_max_get_best_move(priceTable, newState, 2, depth+1, False)
 			if new[2] > MAX:
 				MAX, maxi, maxj = new[2], move[0], move[1]
 		print(depth, maxi, maxj, MAX)
@@ -333,7 +345,8 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth):
 		#white
 		MIN, mini, minj = 10000000000, None, None
 		for move in moves:
-			new = min_max_get_best_move(priceTable, currentState.get_successor_state(myColor, move[0], move[1]), 1, depth+1)
+			newState = currentState.get_successor_state(myColor, move[0], move[1])
+			new = min_max_get_best_move(priceTable, newState, 1, depth+1, False)
 			if new[2] < MIN:
 				MIN, mini, minj = new[2], move[0], move[1]
 		print (depth, mini, minj, MIN)
