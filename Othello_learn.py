@@ -1,4 +1,3 @@
-import pygame
 import time
 import method
 GREEN = (0, 153, 51)
@@ -9,7 +8,7 @@ BASE = 2#position of up-left corner
 #=======limits=======#
 limit_depth = 5
 dice = 0.8
-reward = 0.7
+reward = 0.3
 print_or_not = True
 
 class game:
