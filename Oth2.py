@@ -347,7 +347,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, True)
 	if myColor == 1:
 		#black
-		MAX, maxi, maxj = -10000000000, None, None
+		MAX, maxi, maxj = float('-inf'), None, None
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
 			new = min_max_get_best_move(priceTable, newState, 2, depth+1, False)
@@ -359,7 +359,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		return (maxi, maxj, MAX)
 	elif myColor == 2:
 		#white
-		MIN, mini, minj = 10000000000, None, None
+		MIN, mini, minj = float('inf'), None, None
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
 			#print "new"
