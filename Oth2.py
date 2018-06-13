@@ -130,16 +130,18 @@ class game:
 				self.next_turn()
 				if self.origin_board.haveMove(self.turn) == -1:
 					#game ends
-					self.get_winner(self.origin_board.count_wb())
+					white, black = self.origin_board.count_wb()
+					self.get_winner(black, white)
 
 			while not success:
 				pos = None
 				if self.get_turn() == 2:
+					useless = raw_input().split()
 					print "Computer's turn"
 					#pos = naiive_get_best_move(self.origin_board, 2)
 					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1, False)
 					print "AI chose", pos
-					time.sleep(2)
+					#time.sleep(2)
 				else:
 					pos = raw_input().split()
 					try:
@@ -331,11 +333,11 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		return (None, None, value)
 	moves = currentState.get_legal_moves(myColor, True)
 	if warn == True:
-		if moves == None:
+		if len(moves) == 0:
 			value = currentState.evaluate(priceTable)
 			#print (depth, None, None, value)
 			return (None, None, value)
-	elif moves == None:
+	elif len(moves) == 0:
 		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, True)
 	if myColor == 1:
 		#black
