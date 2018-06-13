@@ -8,8 +8,8 @@ BROWN = (237, 217, 177)
 BASE = 2#position of up-left corner
 #=======limits=======#
 limit_depth = 5
-dice = 0.75
-reward = 0.2
+dice = 0.8
+reward = 0.7
 print_or_not = True
 
 class game:
@@ -376,6 +376,8 @@ if __name__ == "__main__":
 		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
 		pri = False
 		for i in range(0, repeat):
+			if i%50 == 0:
+				print i, "th times"
 			Game = game()
 			bmoves, wmoves, nobody = [], [], []
 			Game.handle(bmoves, wmoves, nobody, True)
