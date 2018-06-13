@@ -3,6 +3,15 @@
 game負責繪圖，並且handle遊戲進行
 gameState儲存當前board的狀態
 
+Files:
+  Othello.py: 最原始的遊戲
+  Oth.py: ?
+  Oth2.py: 人vs Minimax
+  Othello_learn.py: 純learn(沒有GUI)
+  newOthello.py:最新的遊戲（play & learn)
+  method.py: 不同種agents
+  eval.txt: train出的price_table
+  eval_old: 初始的price_table
 在init game的時候會同時宣告一個gameState（gameState在game裡面）
 
 6/13 14:55:    b05902020 
