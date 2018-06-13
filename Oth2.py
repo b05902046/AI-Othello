@@ -132,6 +132,9 @@ class game:
 					#game ends
 					white, black = self.origin_board.count_wb()
 					self.get_winner(black, white)
+					raw_input()
+					success = True
+					self.set_done(True)
 
 			while not success:
 				pos = None
@@ -167,6 +170,7 @@ class game:
 
 						if total == 64:
 							self.get_winner(black, white)
+							raw_input()
 
 					else:
 						print "illegal move"
