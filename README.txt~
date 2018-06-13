@@ -1,6 +1,0 @@
-分為game, gameState兩個class
-
-game負責繪圖，並且handle遊戲進行
-gameState儲存當前board的狀態
-
-在init game的時候會同時宣告一個gameState（gameState在game裡面）
