@@ -367,10 +367,11 @@ class gameState:
 
 
 if __name__ == "__main__":
-	control = raw_input().split()
+	control = raw_input("repeat, depth\n").split()
 	if int(control[0]) == -1:
 		print "play mode"
 		Game = game()
+		Game.handle([],[],[],False)
 	else:
 		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
 		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
