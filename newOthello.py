@@ -76,15 +76,15 @@ class game:
 	def set_winner(self, black, white, nobody):
 		self.done = True
 		if black > white:
-			if pri == True:
+			if print_or_not == True:
 				print "Black Wins"
 			self.winner = 1
 		elif white > black:
-			if pri == True:
+			if print_or_not == True:
 				print "White Wins"
 			self.winner = 2
 		else:
-			if pri == True:
+			if print_or_not == True:
 				print "Draw"
 			self.winner = 0
 		for i in range(1, 9):
@@ -179,10 +179,10 @@ class game:
 				else:
 					if self.get_turn() == 2:
 						#useless = raw_input().split()
-						if pri == True:
+						if print_or_not == True:
 							print "Computer's turn"
 						pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha_rand")
-						if pri == True:
+						if print_or_not == True:
 							print "AI chose", pos
 						#time.sleep(0.5)
 					else:
@@ -195,7 +195,7 @@ class game:
 				if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or self.origin_board.occupation(pos[0], pos[1]):#position occupied or out of range
 					print "illegal move"
 				else:
-					if pri == True:
+					if print_or_not == True:
 						print "turn", self.get_turn()
 					result = self.origin_board.check(pos[0], pos[1], self.get_turn(), 0, self.screen)
 					#self.origin_board.print_board()
@@ -206,7 +206,7 @@ class game:
 						self.changeScore(self.font, black, white)
 						success = True
 						self.next_turn()
-						if pri == True:
+						if print_or_not == True:
 							self.origin_board.print_board()
 						if total == 64:
 							self.set_winner(black, white, nobody)
@@ -337,7 +337,7 @@ class gameState:
 					if result > 0:
 						moves += [[i, j, result]]
 	        #[x, y, score]
-		if pri == True and flag == True:
+		if print_or_not == True and flag == True:
 			print "Possible moves:"
 			print moves
 		return moves
@@ -374,9 +374,9 @@ if __name__ == "__main__":
 	else:
 		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
 		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
-		pri = False
+		print_or_not = False
 		for i in range(0, repeat):
-			if i%50 == 0:
+			if i%10 == 0:
 				print i, "th times"
 			Game = game()
 			bmoves, wmoves, nobody = [], [], []
