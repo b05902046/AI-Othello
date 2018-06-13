@@ -132,6 +132,7 @@ class game:
 					#game ends
 					white, black = self.origin_board.count_wb()
 					self.get_winner(black, white)
+					pygame.display.flip()
 					raw_input()
 					success = True
 					self.set_done(True)
@@ -139,7 +140,7 @@ class game:
 			while not success:
 				pos = None
 				if self.get_turn() == 2:
-					useless = raw_input().split()
+					#useless = raw_input().split()
 					print "Computer's turn"
 					#pos = naiive_get_best_move(self.origin_board, 2)
 					pos = min_max_get_best_move(self.price_table, self.origin_board, 2, 1, False)
@@ -170,6 +171,7 @@ class game:
 
 						if total == 64:
 							self.get_winner(black, white)
+							pygame.display.flip()
 							raw_input()
 
 					else:
@@ -335,7 +337,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		value = currentState.evaluate(priceTable)
 		#print (depth, None, None, value)
 		return (None, None, value)
-	moves = currentState.get_legal_moves(myColor, True)
+	moves = currentState.get_legal_moves(myColor, False)
 	if warn == True:
 		if len(moves) == 0:
 			value = currentState.evaluate(priceTable)
