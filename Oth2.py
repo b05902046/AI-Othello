@@ -6,7 +6,7 @@ WHITE = (255, 255, 255)
 BROWN = (237, 217, 177)
 BASE = 2#position of up-left corner
 #=======limits=======#
-limit_depth = 5
+limit_depth = 9
 
 class game:
 	def __init__(self):
