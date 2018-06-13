@@ -8,8 +8,8 @@ BROWN = (237, 217, 177)
 BASE = 2#position of up-left corner
 #=======limits=======#
 limit_depth = 5
-dice = 0.7
-reward = 0.1
+dice = 0.75
+reward = 0.2
 print_or_not = True
 
 class game:
@@ -367,31 +367,35 @@ class gameState:
 
 
 if __name__ == "__main__":
-	control = int(raw_input())
-	if control == -1:
+	control = raw_input().split()
+	if int(control[0]) == -1:
 		print "play mode"
 		Game = game()
 	else:
-		print "learn mode"
+		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
+		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
 		pri = False
-		for i in range(0, control):
+		for i in range(0, repeat):
 			Game = game()
 			bmoves, wmoves, nobody = [], [], []
 			Game.handle(bmoves, wmoves, nobody, True)
 			winner = Game.get_winner()
 			priTable = Game.get_price_table()
 			if winner == 1:
+				black_wins = black_wins + 1
 				for move in bmoves:
 					priTable[move[0]][move[1]] += 2*reward
 				for move in nobody:
 					priTable[move[0]][move[1]] += reward		
 			elif winner == 2:
+				white_wins = white_wins + 1
 				for move in wmoves:
 					priTable[move[0]][move[1]] += 2*reward
 				for move in bmoves:
 					priTable[move[0]][move[1]] += reward
 			Game.normalize_price_table()
 			Game.write_price_table()
+		print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
 """
 while not done:
 	for event in pygame.event.get():
