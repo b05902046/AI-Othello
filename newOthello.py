@@ -11,6 +11,7 @@ limit_depth = 5
 dice = 0.8
 reward = 0.7
 print_or_not = True
+eval_file_name = "eval.txt"
 
 class game:
 	def __init__(self):
@@ -114,7 +115,7 @@ class game:
 				self.price_table[i][j] /= summ
 
 	def read_price_table(self):
-		f = open("eval.txt", "r")
+		f = open(eval_file_name, "r")
 		temp = f.read().split()
 		for i in range(1, 9):
 			for j in range(1, 9):
@@ -122,7 +123,7 @@ class game:
 		f.close()
 
 	def write_price_table(self):
-		f = open("eval.txt", "w+")
+		f = open(eval_file_name, "w+")
 		for i in range(1, 9):
 			for j in range(1, 9):
 				f.write(str(self.price_table[i][j]) + ' ')
@@ -181,10 +182,10 @@ class game:
 						#useless = raw_input().split()
 						if print_or_not == True:
 							print "Computer's turn"
-						pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha_rand")
+						pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha")
 						if print_or_not == True:
 							print "AI chose", pos
-						#time.sleep(0.5)
+						time.sleep(1)
 					else:
 						pos = raw_input().split()
 						try:
@@ -369,7 +370,8 @@ class gameState:
 if __name__ == "__main__":
 	control = raw_input("repeat, depth\n").split()
 	if int(control[0]) == -1:
-		print "play mode"
+		eval_file_name = control[1]
+		print "play mode   eval_file_name:", eval_file_name		
 		Game = game()
 		Game.handle([],[],[],False)
 	else:
