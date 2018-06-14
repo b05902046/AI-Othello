@@ -176,9 +176,9 @@ class game:
 				pos = None
 					#============for learning================#
 				if self.turn == 1:
-					pos = method.getAction(dice, self.price_table_B, self.origin_board, self.turn, limit_depth, "alpha_rand")
+					pos = method.getAction(dice, self.price_table_B, self.origin_board, self.turn, limit_depth, "alpha")
 				else:
-					pos = method.getAction(dice, self.price_table_W, self.origin_board, self.turn, limit_depth, "alpha_rand")
+					pos = method.getAction(dice, self.price_table_W, self.origin_board, self.turn, limit_depth, "alpha")
 				#time.sleep(0.5)
 
 				if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or self.origin_board.occupation(pos[0], pos[1]):#position occupied or out of range
