@@ -17,7 +17,13 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 	moves = currentState.get_legal_moves(myColor, False)
 	if warn == True:
 		if len(moves) == 0:
-			value = currentState.evaluate(priceTable)
+			me, another, nums = (2 - myColor), (myColor - 1), currentState.count_wb()
+			if nums[myColor] > nums[another]:
+				value = float('inf')
+			elif nums[myColor] < nums[another]:
+				value = float('-inf')
+			else:
+				value = 0
 			#print (depth, None, None, value)
 			return (None, None, value)
 	elif len(moves) == 0:
@@ -56,7 +62,13 @@ def alpha_beta(priceTable, currentState, myColor, depth, limit_depth, warn, alph
 	moves = currentState.get_legal_moves(myColor, False)
 	if warn == True:
 		if len(moves) == 0:
-			value = currentState.evaluate(priceTable)
+			me, another, nums = (2-myColor), (myColor-1), currentState.count_wb()
+			if nums[me] > nums[another]:
+				value = float('inf')
+			elif nums[me] < nums[another]:
+				value = float('-inf')
+			else:
+				value = 0
 			#print (depth, None, None, value)
 			return (None, None, value)
 	elif len(moves) == 0:
