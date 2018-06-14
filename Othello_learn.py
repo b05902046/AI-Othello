@@ -12,16 +12,20 @@ reward = 0.3
 print_or_not = True
 
 class game:
-	def __init__(self):
+	def __init__(self, opponent_file, learner_file):
 		self.done = False
 		self.turn = 1#black piece for 1, white piece for 2
-#============board=============#
-
+#============board================#
 		self.origin_board = gameState()
 #============price_table==========#
-		self.price_table = [ [0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]
-#=================================#
-
+		self.price_table = [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
+		self.price_table += [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
+#============file_name============#
+		self.filename = [opponent_file] + [learner_file]
+#============move_records=========#
+		self.bmoves = []
+		self.wmoves = []
+		self.nobody = []
 	
 	def get_board(self):
 		return self.origin_board
@@ -35,10 +39,10 @@ class game:
 	def get_winner(self):
 		return self.winner
 
-	def get_price_table(self):
-		return self.price_table
+	def get_price_table(self, myColor):
+		return self.price_table[myColor - 1]
 
-	def set_winner(self, black, white, nobody):
+	def set_winner(self, black, white):
 		self.done = True
 		if black > white:
 			if print_or_not == True:
@@ -55,7 +59,7 @@ class game:
 		for i in range(1, 9):
 			for j in range(1, 9):
 				if self.origin_board.occupation(i, j) == False:
-					nobody.append((i, j))
+					self.nobody.append((i, j))
 
 	def set_done(self, param):
 		self.done = param
@@ -69,28 +73,41 @@ class game:
 		else:
 			self.set_turn(1)
 
-	def normalize_price_table(self):
+	def update_price_table(self, myColor):
+		winner = Game.get_winner()
+		if winner == 1:
+			for move in self.bmoves:
+				self.price_table[myColor - 1][move[0]][move[1]] += 2*reward
+			for move in self.nobody:
+				self.price_table[myColor - 1][move[0]][move[1]] += reward		
+		elif winner == 2:
+			for move in self.wmoves:
+				self.price_table[myColor - 1][move[0]][move[1]] += 2*reward
+			for move in self.nobody:
+				self.price_table[myColor - 1][move[0]][move[1]] += reward
+
+	def normalize_price_table(self, myColor):
 		summ = 0
 		for i in range(1, 9):
-			summ += sum(self.price_table[i])
+			summ += sum(self.price_table[myColor - 1][i])
 		summ /= 64
 		for i in range(1, 9):
 			for j in range(1, 9):
-				self.price_table[i][j] /= summ
+				self.price_table[myColor - 1][i][j] /= summ
 
-	def read_price_table(self):
-		f = open("eval.txt", "r")
+	def read_price_table(self, myColor):
+		f = open(self.filename[myColor - 1], "r")
 		temp = f.read().split()
 		for i in range(1, 9):
 			for j in range(1, 9):
-				self.price_table[i][j] = float(temp[(i - 1)*8 + (j - 1)])
+				self.price_table[myColor - 1][i][j] = float(temp[(i - 1)*8 + (j - 1)])
 		f.close()
 
-	def write_price_table(self):
-		f = open("eval.txt", "w+")
+	def write_price_table(self, myColor):
+		f = open(self.filename[myColor - 1], "w+")
 		for i in range(1, 9):
 			for j in range(1, 9):
-				f.write(str(self.price_table[i][j]) + ' ')
+				f.write(str(self.price_table[myColor - 1][i][j]) + ' ')
 			f.write('\n')
 		f.close()
 	
@@ -98,36 +115,36 @@ class game:
 	def changeScore(self, font, black, white):#score of black
 		return black + white
 	"""
-	def handle(self, bmoves, wmoves, nobody, learn):
+	def handle(self, learn):
 		while not self.get_done():
 			success = False
-			self.read_price_table()
+			self.read_price_table(1)
+			self.read_price_table(2)
 			if self.origin_board.haveMove(self.turn) == -1:
 				self.next_turn()
 				if self.origin_board.haveMove(self.turn) == -1:
 					#game ends
 					white, black = self.origin_board.count_wb()
-					self.set_winner(black, white, nobody)
-				#raw_input()
+					self.set_winner(black, white)
+			        	#raw_input()
 					success = True
 					self.set_done(True)
-
 
 			while not success:
 				pos = None
 				if learn == True:
 					#============for learning================#
-					pos = method.getAction(dice, self.price_table, self.origin_board, self.turn, limit_depth, "alpha_rand")
+					pos = method.getAction(dice, self.price_table[self.turn - 1], self.origin_board, self.turn, limit_depth, "alpha_rand")
 					if self.turn == 1:
-						bmoves.append((pos[0], pos[1]))
+						self.bmoves.append((pos[0], pos[1]))
 					else:
-						wmoves.append((pos[0], pos[1]))
+						self.wmoves.append((pos[0], pos[1]))
 				else:
 					if self.get_turn() == 2:
 						#useless = raw_input().split()
 						if print_or_not == True:
 							print "Computer's turn"
-							pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha_rand")
+							pos = method.getAction(dice, self.price_table[self.turn - 1], self.origin_board, 2, limit_depth, "alpha_rand")
 						if print_or_not == True:
 							print "AI chose", pos
 						#time.sleep(0.5)
@@ -147,15 +164,13 @@ class game:
 					#self.origin_board.print_board()
 					if result > 0:
 						white, black = self.origin_board.count_wb()
-
 						total = black + white
 						success = True
 						self.next_turn()
 						if print_or_not == True:
 							self.origin_board.print_board()
 						if total == 64:
-							self.set_winner(black, white, nobody)
-						
+							self.set_winner(black, white)
 							#raw_input()
 
 					else:
@@ -306,11 +321,12 @@ class gameState:
 
 
 if __name__ == "__main__":
+	print "please enter: times to repeat, limit_depth, opponent's eval_file, learner's eval_file"
 	control = raw_input().split()
 	if int(control[0]) == -1:
 		print "play mode"
 		Game = game()
-		Game.handle([], [], [], False)
+		Game.handle(False)
 	else:
 		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
 		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
@@ -318,25 +334,16 @@ if __name__ == "__main__":
 		for i in range(0, repeat):
 			if i%10 == 0:
 				print i, "th times"
-			Game = game()
-			bmoves, wmoves, nobody = [], [], []
-			Game.handle(bmoves, wmoves, nobody, True)
-			winner = Game.get_winner()
-			priTable = Game.get_price_table()
-			if winner == 1:
-				black_wins = black_wins + 1
-				for move in bmoves:
-					priTable[move[0]][move[1]] += 2*reward
-				for move in nobody:
-					priTable[move[0]][move[1]] += reward		
-			elif winner == 2:
-				white_wins = white_wins + 1
-				for move in wmoves:
-					priTable[move[0]][move[1]] += 2*reward
-				for move in bmoves:
-					priTable[move[0]][move[1]] += reward
-			Game.normalize_price_table()
-			Game.write_price_table()
+			Game = game(control[2], control[3])
+			Game.handle(True)
+			Game.update_price_table(2)
+			Game.normalize_price_table(2)
+			Game.write_price_table(2)
+			if Game.get_winner() == 1:
+				black_wins += 1
+			else:
+				white_wins += 1
+			
 		print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
 """
 while not done:
