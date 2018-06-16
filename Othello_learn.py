@@ -138,11 +138,11 @@ class game:
 				if learn == True:
 					#============for learning================#
 					if self.turn == 1:
-						self.bmoves.append((pos[0], pos[1]))
-                                                pos = method.getAction(dice, self.price_table[0], self.origin_board, 1, limit_depth, "alpha")
+						pos = method.getAction(dice, self.price_table[0], self.origin_board, 1, limit_depth, "alpha")
+                                                self.bmoves.append((pos[0], pos[1]))
 					else:
-						self.wmoves.append((pos[0], pos[1]))
-                                                pos = method.getAction(1, self.price_table[1], self.origin_board, 2, limit_depth, "alpha_rand")
+						pos = method.getAction(1, self.price_table[1], self.origin_board, 2, limit_depth, "alpha_rand")
+                                                self.wmoves.append((pos[0], pos[1]))
 				else:
 					if self.get_turn() == 2:
 						#useless = raw_input().split()
