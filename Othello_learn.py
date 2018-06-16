@@ -324,7 +324,7 @@ class gameState:
 
 
 if __name__ == "__main__":
-	print "please enter: times to repeat, limit_depth, learner's eval_file, opponent's eval_file"
+	print "please enter: times to repeat, limit_depth, opponent's eval_file, learner's eval_file"
 	control = raw_input().split()
 	if int(control[0]) == -1:
 		print "play mode"
