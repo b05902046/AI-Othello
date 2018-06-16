@@ -22,6 +22,8 @@ class game:
 		self.price_table += [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
 #============file_name============#
 		self.filename = [opponent_file] + [learner_file]
+		print "opponent's filename ", self.filename[0]
+		print "learner's filename = ", self.filename[1]
 #============move_records=========#
 		self.bmoves = []
 		self.wmoves = []
@@ -104,6 +106,7 @@ class game:
 		f.close()
 
 	def write_price_table(self, myColor):
+		print "writing to ", self.filename[myColor - 1]
 		f = open(self.filename[myColor - 1], "w+")
 		for i in range(1, 9):
 			for j in range(1, 9):
@@ -321,7 +324,7 @@ class gameState:
 
 
 if __name__ == "__main__":
-	print "please enter: times to repeat, limit_depth, opponent's eval_file, learner's eval_file"
+	print "please enter: times to repeat, limit_depth, learner's eval_file, opponent's eval_file"
 	control = raw_input().split()
 	if int(control[0]) == -1:
 		print "play mode"
