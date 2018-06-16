@@ -8,7 +8,7 @@ BASE = 2#position of up-left corner
 #=======limits=======#
 limit_depth = 5
 dice = 0.8
-reward = 0.3
+reward = 3
 print_or_not = True
 
 class game:
@@ -22,8 +22,8 @@ class game:
 		self.price_table += [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
 #============file_name============#
 		self.filename = [opponent_file] + [learner_file]
-		print "opponent's filename ", self.filename[0]
-		print "learner's filename = ", self.filename[1]
+		#print "opponent's filename ", self.filename[0]
+		#print "learner's filename = ", self.filename[1]
 #============move_records=========#
 		self.bmoves = []
 		self.wmoves = []
@@ -106,7 +106,7 @@ class game:
 		f.close()
 
 	def write_price_table(self, myColor):
-		print "writing to ", self.filename[myColor - 1]
+		#print "writing to ", self.filename[myColor - 1]
 		f = open(self.filename[myColor - 1], "w+")
 		for i in range(1, 9):
 			for j in range(1, 9):
