@@ -26,3 +26,8 @@ Files:
   仍然會出現illegal move??????
   Othello_learn.py的game的class裡面有兩個price_table及兩個evaluation file的檔名，並將wmoves, bmoves, nobody整合到class中
   可能還有bug～～～～～～～～
+
+6/16 11:24:    b05902016
+  解決了./Othello_learn.py < input在expand node時回傳illegal move的情形
+  將method.py其中一方勝利時的回傳值改為810000或-810000，避免>float('inf')或是<float('-inf')的情形發生
+  
