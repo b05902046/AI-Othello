@@ -64,9 +64,9 @@ def alpha_beta(priceTable, currentState, myColor, depth, limit_depth, warn, alph
 		if len(moves) == 0:
 			nums = currentState.count_wb()
 			if nums[1] > nums[0]:
-				value = float('inf')
+				value = 810000.0        #something big, but smaller than float('inf')
 			elif nums[1] < nums[0]:
-				value = float('-inf')
+				value = -810000.0       #something small, but bigger than float('-inf')
 			else:
 				value = 0
 			#print (depth, None, None, value)
