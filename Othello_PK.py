@@ -1,4 +1,5 @@
 import time
+import pygame
 import method
 GREEN = (0, 153, 51)
 BLACK = (0, 0, 0)
