@@ -7,8 +7,8 @@ Files:
   Othello.py: 最原始的遊戲
   Oth.py: ?
   Oth2.py: 人vs Minimax
-  Othello_learn.py: 純learn(沒有GUI)
-  newOthello.py:最新的遊戲（play & learn)
+  Othello_learn.py: 純learn(沒有GUI) input: （repeat, depth, opponent file path, learner file path)
+  newOthello.py:最新的遊戲 input:（play: -1, depth, file path ; learn: repeat, depth, opponent file path, learner file path)
   method.py: 不同種agents
   eval.txt: train出的price_table
   eval_old: 初始的price_table

@@ -368,9 +368,9 @@ class gameState:
 
 
 if __name__ == "__main__":
-	control = raw_input("repeat, depth\n").split()
+	control = raw_input("To play: input \"-1, depth, table path\"\nTo learn: input \"repaet, depth\"\n").split()
 	if int(control[0]) == -1:
-		eval_file_name = control[1]
+		limit_depth, eval_file_name = int(control[1]), control[2]
 		print "play mode   eval_file_name:", eval_file_name		
 		Game = game()
 		Game.handle([],[],[],False)
