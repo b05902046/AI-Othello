@@ -74,7 +74,7 @@ class game:
 	def get_price_table(self):
 		return self.price_table
 
-	def set_winner(self, black, white, nobody):
+	def set_winner(self, black, white):
 		self.done = True
 		if black > white:
 			if print_or_not == True:
@@ -88,10 +88,7 @@ class game:
 			if print_or_not == True:
 				print "Draw"
 			self.winner = 0
-		for i in range(1, 9):
-			for j in range(1, 9):
-				if self.origin_board.occupation(i, j) == False:
-					nobody.append((i, j))
+
 
 	def set_done(self, param):
 		self.done = param
@@ -149,19 +146,16 @@ class game:
 			self.screen.blit(self.text, (365, 462))
 		return black + white
 
-	def handle(self, bmoves, wmoves, nobody, learn):
+	def handle(self):
+		self.read_price_table()
 		while not self.get_done():
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					self.set_done(True)
 			success = False
-			self.read_price_table()
 			if self.origin_board.haveMove(self.turn) == -1:
 				self.next_turn()
 				if self.origin_board.haveMove(self.turn) == -1:
 					#game ends
 					white, black = self.origin_board.count_wb()
-					self.set_winner(black, white, nobody)
+					self.set_winner(black, white)
 					pygame.display.flip()
 					#raw_input()
 					success = True
@@ -169,30 +163,25 @@ class game:
 
 
 			while not success:
-				pos = None
-				if learn == True:
-					#============for learning================#
-					pos = method.getAction(dice, self.price_table, self.origin_board, self.turn, limit_depth, "alpha_rand")
-					if self.turn == 1:
-						bmoves.append((pos[0], pos[1]))
-					else:
-						wmoves.append((pos[0], pos[1]))
-				else:
-					if self.get_turn() == 2:
+				pos = (-1,-1)
+				for event in pygame.event.get():
+					if event.type == pygame.QUIT:
+						self.set_done(True)
+					elif event.type == pygame.MOUSEBUTTONDOWN and self.get_turn() == 1:
+						mpos = pygame.mouse.get_pos()
+						pos = (mpos[1] // 50, mpos[0] // 50)
+						break
+				if pos == (-1,-1) and self.turn == 1:
+					continue
+				if self.get_turn() == 2:
 						#useless = raw_input().split()
-						if print_or_not == True:
-							print "Computer's turn"
-						pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha")
-						if print_or_not == True:
-							print "AI chose", pos
+					if print_or_not == True:
+						print "Computer's turn"
+					pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha")
+					if print_or_not == True:
+						print "AI chose", pos
 						time.sleep(1)
-					else:
-						pos = raw_input().split()
-						try:
-							pos[0], pos[1] = int(pos[0]), int(pos[1])
-						except:
-							print "Wrong input format"
-							continue
+
 				if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or self.origin_board.occupation(pos[0], pos[1]):#position occupied or out of range
 					print "illegal move"
 				else:
@@ -210,7 +199,7 @@ class game:
 						if print_or_not == True:
 							self.origin_board.print_board()
 						if total == 64:
-							self.set_winner(black, white, nobody)
+							self.set_winner(black, white)
 							pygame.display.flip()
 							#raw_input()
 
@@ -368,39 +357,18 @@ class gameState:
 
 
 if __name__ == "__main__":
-	control = raw_input("To play: input \"-1, depth, table path\"\nTo learn: input \"repaet, depth\"\n").split()
-	if int(control[0]) == -1:
-		limit_depth, eval_file_name = int(control[1]), control[2]
-		print "play mode   eval_file_name:", eval_file_name		
-		Game = game()
-		Game.handle([],[],[],False)
+	control = raw_input("To play: input depth, table path\n").split()
+	limit_depth, eval_file_name = int(control[0]), control[1]
+	Game = game()
+	Game.handle()
+	winner = Game.get_winner()
+	if winner == 0:
+		print "Draw"
+	elif winner == 1:
+		print "Black"
 	else:
-		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
-		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
-		print_or_not = False
-		for i in range(0, repeat):
-			if i%10 == 0:
-				print i, "th times"
-			Game = game()
-			bmoves, wmoves, nobody = [], [], []
-			Game.handle(bmoves, wmoves, nobody, True)
-			winner = Game.get_winner()
-			priTable = Game.get_price_table()
-			if winner == 1:
-				black_wins = black_wins + 1
-				for move in bmoves:
-					priTable[move[0]][move[1]] += 2*reward
-				for move in nobody:
-					priTable[move[0]][move[1]] += reward		
-			elif winner == 2:
-				white_wins = white_wins + 1
-				for move in wmoves:
-					priTable[move[0]][move[1]] += 2*reward
-				for move in bmoves:
-					priTable[move[0]][move[1]] += reward
-			Game.normalize_price_table()
-			Game.write_price_table()
-		print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
+		print "white"
+		
 """
 while not done:
 	for event in pygame.event.get():
