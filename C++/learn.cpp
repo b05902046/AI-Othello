@@ -16,9 +16,9 @@ void playGame(Agent &b, Agent &w, unsigned int *record){
 			continue;
 		}
 		if(board.isBlacksTurn()){
-			move = b.getBestMove(board); ++(record[move]);
+			move = b.getMove(board); ++(record[move]);
 		}else{
-			move = w.getBestMove(board); --(record[move]);
+			move = w.getMove(board); --(record[move]);
 		}
 		board.changeBoard(move);
 	}

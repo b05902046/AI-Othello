@@ -43,6 +43,11 @@ bool Board::isEmpty(Square square)const{
 	return !occupied[square];
 }
 
+void Board::getBoardString(char *string)const{
+	for(int i=0;i<64;++i)
+		string[i] = '0'+isWho((Square)i);
+}
+
 bitset<64> Board::getAllEmpty()const{
 	bitset<64> temp = occupied; temp.flip();
 	return temp;
