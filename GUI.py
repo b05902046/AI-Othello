@@ -85,7 +85,7 @@ while True:
 		black, white = 0, 0
 		for entry in range(64):
 			row, col = entry // 8 + 1, entry % 8 + 1
-			pygame.draw.circle(screen, COLOR[string[entry]], (25 + 50 * row, 25 + 50 * col), 15)
+			pygame.draw.circle(screen, COLOR[string[entry]], (25 + 50 * col, 25 + 50 * row), 15)
 			if entry == 1:
 				black += 1
 			elif entry == 2:
