@@ -82,7 +82,6 @@ while True:
 	if r:
 		string = input()
 		string = [ int(x) for x in string ]
-		print(len(string))
 		black, white = 0, 0
 		for entry in range(64):
 			row, col = entry // 8 + 1, entry % 8 + 1
