@@ -55,8 +55,9 @@ sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const 
 		if(warn){
 			bitset<64> black = board.getAllBlack(), white = board.getAllWhite();
 			int bNum = black.count(), wNum = white.count();
-			if(bNum > wNum) ret.eval = INF-1;
-			else ret.eval = (bNum < wNum)? MINF+1 : 0.0;
+			if(bNum > wNum) ret.eval = (isBlack)? (INF-1) : (MINF+1);
+			else if(bNum < wNum) ret.eval = (isBlack)? (MINF+1): (INF-1);
+			else ret.eval = 0.0;
 			return ret;
 		}else{
 			tempBoard.reverseTurn();
@@ -124,7 +125,7 @@ Square Agent::playerGetMove(Board &board){
 	int num = legalMoves.size(), iRead, jRead;
 	for(int i=0;i<num;++i) printf("(%d %d) ", getI(legalMoves[i])+1, getJ(legalMoves[i])+1);
 	while(1){
-		scanf("%d%d", &iRead, &jRead);
+		scanf("%d%d", &iRead, &jRead); --iRead; --jRead;
 		if(!outOfBound(iRead, jRead)) return getSquare(iRead, jRead);
 		else printf("Invalid move!\n");
 	}
@@ -132,20 +133,20 @@ Square Agent::playerGetMove(Board &board){
 
 Agent::Agent(){
 	type = PLAYER;
-	getMoveFunction = std::bind(&Agent::getBestMove, this, std::placeholders::_1);
+	getMoveFunction = std::bind(&Agent::playerGetMove, this, std::placeholders::_1);
 }
 
-Agent::Agent(const AgentType &which, char *readFileName = NULL, int depthL = 5, double ran = 0.7){
+Agent::Agent(bool isB, const AgentType &which, char *readFileName = NULL, int depthL = 5, double ran = 0.7){
 	if((type = which) != PLAYER){
-		depthLimit = depthL; rand = ran;
+		isBlack = isB; depthLimit = depthL; rand = ran;
 		setEvalNames(readFileName, readFileName);
 		getPriceTable();
 		getMoveFunction = std::bind(&Agent::getBestMove, this, std::placeholders::_1);
 	}else getMoveFunction = std::bind(&Agent::playerGetMove, this, std::placeholders::_1);
 }
 
-Agent::Agent(const AgentType &which, char *readFileName, char *writeFileName, int depthL, double ran){
-	type = which; depthLimit = depthL; rand = ran;
+Agent::Agent(bool isB, const AgentType &which, char *readFileName, char *writeFileName, int depthL, double ran){
+	isBlack = isB; type = which; depthLimit = depthL; rand = ran;
 	setEvalNames(readFileName, writeFileName);
 	getPriceTable();
 	if(type == PLAYER) std::bind(&Agent::playerGetMove, this, std::placeholders::_1);
@@ -176,9 +177,16 @@ void Agent::writePriceTable(unsigned int *array, double re){
 double Agent::evaluateBoard(const Board &board){
 	double ret = 0.0;
 	bitset<64> black = board.getAllBlack(), white = board.getAllWhite();
-	for(int i=0;i<64;++i){
-		if(white[i]) ret -= priceTable[i];
-		else if(black[i]) ret += priceTable[i];
+	if(isBlack){
+		for(int i=0;i<64;++i){
+			if(white[i]) ret -= priceTable[i];
+			else if(black[i]) ret += priceTable[i];
+		}
+	}else{
+		for(int i=0;i<64;++i){
+			if(white[i]) ret += priceTable[i];
+			else if(black[i]) ret -= priceTable[i];
+		}
 	}
 	return ret;
 }
