@@ -5,8 +5,6 @@ gameState儲存當前board的狀態
 
 Files:
   Othello.py: 最原始的遊戲
-  Oth.py: ?
-  Oth2.py: 人vs Minimax
   Othello_learn.py: 純learn(沒有GUI) input: （repeat, depth, opponent file path, learner file path)
   newOthello.py:最新的遊戲 input:（play: -1, depth, file path ; learn: repeat, depth, opponent file path, learner file path)
   method.py: 不同種agents
@@ -30,4 +28,10 @@ Files:
 6/16 11:24:    b05902016
   解決了./Othello_learn.py < input在expand node時回傳illegal move的情形
   將method.py其中一方勝利時的回傳值改為810000或-810000，避免>float('inf')或是<float('-inf')的情形發生
+  
+6/19 18:29:  b05902020 
+  更新C++可call python GUI.py進行繪圖
+  make learn ==> 學習用 
+  make playGUI ==> 進行遊戲 
+    支援真人和電腦共四種玩法 
   
