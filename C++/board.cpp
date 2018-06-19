@@ -76,7 +76,7 @@ vector<Direction> Board::canReverse(Square square){
 	vector<Direction> ret; bool flag;
 	if(!isEmpty(square)) return ret;
 	if(blacksTurn){
-		for(Direction direction = Right;direction<8;direction = (Direction)(direction+1)){
+		for(Direction direction = Right;((int)direction)<8;direction = (Direction)(direction+1)){
 			flag = false; Square recent = square;
 			while(1){
 				recent = nextSquare(recent, direction);
@@ -91,7 +91,7 @@ vector<Direction> Board::canReverse(Square square){
 			}
 		}
 	}else{
-		for(Direction direction = Right;direction<8;direction = (Direction)(direction+1)){
+		for(Direction direction = Right;((int)direction)<8;direction = (Direction)(direction+1)){
 			flag = false; Square recent = square;
 			while(1){
 				recent = nextSquare(recent, direction);
