@@ -10,6 +10,7 @@ Files:
   method.py: 不同種agents
   eval.txt: train出的price_table
   eval_old: 初始的price_table
+  GUI.py: 協助C++繪圖
   input: 將此檔案重導向給Othello_learn.py 會讓先手使用eval_old.txt作為price_table，後手則是使用eval.txt(只有後手會learn)
 
 在init game的時候會同時宣告一個gameState（gameState在game裡面）

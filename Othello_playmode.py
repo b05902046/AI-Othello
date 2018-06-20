@@ -168,13 +168,12 @@ class game:
 					if event.type == pygame.QUIT:
 						self.set_done(True)
 					elif event.type == pygame.MOUSEBUTTONDOWN and self.get_turn() == 1:
-						mpos = pygame.mouse.get_pos()
+						mpos = pygame.mouse.get_pos()#mouse position
 						pos = (mpos[1] // 50, mpos[0] // 50)
 						break
 				if pos == (-1,-1) and self.turn == 1:
 					continue
 				if self.get_turn() == 2:
-						#useless = raw_input().split()
 					if print_or_not == True:
 						print "Computer's turn"
 					pos = method.getAction(dice, self.price_table, self.origin_board, 2, limit_depth, "alpha")
@@ -196,12 +195,12 @@ class game:
 						self.changeScore(self.font, black, white)
 						success = True
 						self.next_turn()
-						if print_or_not == True:
+						if print_or_not == True:#print board
 							self.origin_board.print_board()
 						if total == 64:
 							self.set_winner(black, white)
 							pygame.display.flip()
-							#raw_input()
+
 
 					else:
 						print "illegal move"
@@ -369,17 +368,5 @@ if __name__ == "__main__":
 	else:
 		print "white"
 		
-"""
-while not done:
-	for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                        done = True
-		elif event.type == pygame.MOUSEBUTTONDOWN:
-			changeScore(font, 3, 15)
 
-
-
-        pygame.display.flip()
-
-"""
 
