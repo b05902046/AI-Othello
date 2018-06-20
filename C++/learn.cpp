@@ -1,13 +1,13 @@
 #include "board.hpp"
 #include "agent.hpp"
-
+#include <iostream>
 #define SIZE 32
 
 char bType[SIZE], wType[SIZE],
 	blackIn[SIZE], blackOut[SIZE],
 	whiteIn[SIZE], whiteOut[SIZE];
 
-void playGame(Agent &b, Agent &w, unsigned int *record){
+void playGame(Agent &b, Agent &w, int *record){
 	Board board; Square move;
 	while(!board.isGameEnded()){
 		if(!board.haveLegalMove()){
@@ -34,12 +34,12 @@ int main(){
 	wT = readAgentType(); scanf("%s%s%d%lf", whiteIn, whiteOut, &wDepth, &wRand);
 	scanf("%u%u%d%lf", &game_per_time, &times, &blackLearn, &reward);
 	Agent bAgent(true, bT, blackIn, blackOut, bDepth, bRand), wAgent(false, wT, whiteIn, whiteOut, wDepth, wRand);
-	unsigned int record[64]; Agent *whoLearn = (blackLearn)? &bAgent : &wAgent;
+	int record[64]; Agent *whoLearn = (blackLearn)? &bAgent : &wAgent;
 	for(unsigned int i=0;i<times;++i){
 		for(int j=0;j<64;++j) record[i] = game_per_time;
-		for(unsigned int j=0;j<game_per_time;++j) playGame(bAgent, wAgent, record);
-		printf("%u time over\n", i);
-		whoLearn->writePriceTable(record, reward);
+		for(unsigned int j=0;j<game_per_time;++j) playGame(bAgent, wAgent, &record[0]);
+		printf("%u time over\n", i); fflush(stdout);
+		whoLearn->writePriceTable(record, ((blackLearn)? reward:-reward));
 	}
 	return 0;
 }
