@@ -1,0 +1,8 @@
+black: [Type] [In] [Out] [Depth] [Rand]
+white: [Type] [In] [Out] [Depth] [Rand]
+[game/time] [times] [black learn?] [reward]
+0 time over
+1 time over
+2 time over
+3 time over
+4 time over
