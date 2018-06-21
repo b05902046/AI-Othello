@@ -27,6 +27,14 @@ bool Board::isGameEnded()const{
 	return ended;
 }
 
+int Board::whoWon(int &bn, int &wn)const{
+	if(!isGameEnded()){ printf("Call whoWon when game not ended!\n"); fflush(stdout); exit(1);}
+	bitset<64> black = getAllBlack(), white = getAllWhite();
+	bn = black.count(); wn = white.count();
+	if(bn > wn) return 1;
+	else return (bn == wn)? 0:-1;
+}
+
 bool Board::isBlacksTurn()const{
 	return blacksTurn;
 }
@@ -135,12 +143,13 @@ vector<Square> Board::getLegalMoves(){
 void Board::print()const{
 	if(ended){
 		printf("Game Ended!\n");
-		bitset<64> black = getAllBlack(), white = getAllWhite();
-		int bn = black.count(), wn = white.count();
+		int bn, wn, result = whoWon(bn, wn);
 		printf("Black: %d   White: %d\n", bn, wn);
-		if(bn > wn) printf("Black won!\n");
-		else if(bn == wn) printf("Draw QQ\n");
-		else printf("White won!\n");
+		switch(result){
+			case 1: printf("Black won!\n"); break;
+			case 0: printf("Draw QQ\n"); break;
+			case -1: printf("White won!\n"); break;
+		}	
 	}else{
 		printf("%s's Turn\n", (blacksTurn)? "Black":"White");
 		for(int i=0, who=-1;i<8;++i){

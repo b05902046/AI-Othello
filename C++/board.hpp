@@ -20,6 +20,7 @@ public:
 	void setGameEnded();
 	void reverseTurn();
 	bool isGameEnded()const;
+	int whoWon(int &bn, int &wn)const;
 	bool isBlacksTurn()const;
 	bool isBlack(Square square)const;
 	bool isWhite(Square square)const;
