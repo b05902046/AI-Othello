@@ -20,11 +20,12 @@ thread threads[THREAD_NUMBER];
 const int deltaRecord[2][2] = {{-1, 1}, {1, -1}};
 
 void playGame(Agent b, Agent w, int *record, int threadId){
+	Square bsMoves[64], wsMoves[64]; int bsMovesNum, wsMovesNum, result, bn, wn;
 	while(1){
 		jobLock.lock();
 		if(job == game_per_time){ jobLock.unlock(); break;}
 		++job; jobLock.unlock();
-		Board board; Square move;
+		Board board; Square move; int bsMovesNum = wsMovesNum = -1;
 		while(!board.isGameEnded()){
 			if(!board.haveLegalMove()){
 				board.reverseTurn();
@@ -33,12 +34,17 @@ void playGame(Agent b, Agent w, int *record, int threadId){
 			}
 			if(board.isBlacksTurn()){
 				move = b.getMove(board); recordLock.lock();
-				record[move] += deltaRecord[blackLearn][0]; recordLock.unlock();
+				bsMoves[++bsMovesNum] = move; recordLock.unlock();
 			}else{
 				move = w.getMove(board); recordLock.lock();
-				record[move] += deltaRecord[blackLearn][1]; recordLock.unlock();
+				wsMoves[++wsMovesNum] = move; recordLock.unlock();
 			}
 			board.changeBoard(move);
+		}
+		if((result = board.whoWon(bn, wn)) != 0){
+			result = (result == 1)? 1:0;
+			for(int i=0;i<bsMovesNum;++i) record[bsMoves[i]] += deltaRecord[result][0];
+			for(int i=0;i<wsMovesNum;++i) record[wsMoves[i]] += deltaRecord[result][1];
 		}
 	}
 }
