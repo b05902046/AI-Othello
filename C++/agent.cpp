@@ -158,8 +158,7 @@ Agent::Agent(const AgentType &which, char *readFileName = NULL, int depthL = 5, 
 Agent::Agent(const AgentType &which, char *readFileName, char *writeFileName, int depthL, double ran){
 	type = which; depthLimit = depthL; rand = ran;
 	isRandom = (type == ALPHA_BETA_RAND || type == ALPHA_BETA_HIS_RAND)? true:false;
-	setEvalNames(readFileName, writeFileName);
-	getPriceTable();
+	setEvalNames(readFileName, writeFileName); getPriceTable();
 	//if(type == PLAYER) std::bind(&Agent::playerGetMove, this, std::placeholders::_1);
 	//else std::bind(&Agent::getBestMove, this, std::placeholders::_1);
 }

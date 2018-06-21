@@ -30,9 +30,10 @@ sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const 
 				ret.moves.clear(); ret.moves.push_back(legalMoves[i]);
 			}else if(childInform.eval == max)
 				ret.moves.push_back(legalMoves[i]);
+			else continue;
 			if(childInform.eval > alpha){
 				alpha =  childInform.eval;
-				if(beta <= alpha) break;
+				if(beta < alpha) break;
 			}
 		}
 	}else{
@@ -45,9 +46,10 @@ sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const 
 				ret.moves.clear(); ret.moves.push_back(legalMoves[i]);
 			}else if(childInform.eval == min)
 				ret.moves.push_back(legalMoves[i]);
+			else continue;
 			if(childInform.eval < beta){
 				beta = childInform.eval;
-				if(beta <= alpha) break;
+				if(beta < alpha) break;
 			}
 		}
 	}

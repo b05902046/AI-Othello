@@ -54,7 +54,7 @@ int main(){
 		close(pipe_fd[0]); AgentType bT, wT;
 		buffer[64] = '\n'; buffer[65] = '\0';
 		char blackIn[32], whiteIn[32];
-		int bDepth, wDepth; double bRand, wRand;
+		int bDepth, wDepth;
 		//set game information
 		printf("black: [Type] [in] [depth]\nwhite: [Type] [in] [depth]\n");
 		bT = readAgentType(); scanf("%s%d", blackIn, &bDepth);
