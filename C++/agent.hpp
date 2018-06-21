@@ -14,7 +14,7 @@ const double INF = 81000000.0;
 const double MINF = -INF;
 
 typedef enum AgentType{
-	PLAYER = 0, ALPHA_BETA, ALPHA_BETA_RAND
+	PLAYER = 0, ALPHA_BETA, ALPHA_BETA_RAND, ALPHA_BETA_HIS, ALPHA_BETA_HIS_RAND
 }AgentType;
 
 typedef struct successorInformation{
@@ -33,6 +33,7 @@ private:
 	int depthLimit;
 	string readEvalName, writeEvalName;
 	double priceTable[64], rand;
+	bool isRandom;
   //function<Square(Board &)> getMoveFunction;
 	
 	void setEvalNames(char *a, char *b);

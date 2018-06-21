@@ -10,6 +10,8 @@ AgentType readAgentType(){
 	scanf("%s", buf);
 	if(strcmp(buf, "AB") == 0) return ALPHA_BETA;
 	else if(strcmp(buf, "ABR") == 0) return ALPHA_BETA_RAND;
+	else if(strcmp(buf, "H") == 0) return ALPHA_BETA_HIS;
+	else if(strcmp(buf, "R") == 0) return ALPHA_BETA_HIS_RAND;
 	else if(strcmp(buf, "PLAYER") == 0) return PLAYER;
 	else{ printf("Wrong agent type: %s\n", buf); exit(1);}
 }
@@ -44,7 +46,8 @@ void Agent::getPriceTable(){
 	fclose(fp);
 }
 
-sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const int &depth, bool warn){
+
+/*sucInform Agent::alphaBetaHis(const Board &board, double alpha, double beta, const int &depth, bool warn){
 	sucInform ret;
 	if(depth == depthLimit){
 		ret.eval = evaluateBoard(board); return ret;
@@ -96,23 +99,31 @@ sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const 
 	}
 	return ret;
 }
+*/
 
 Square Agent::getBestMove(Board &board){
 	sucInform result; int num; vector<Square> legalMoves;
+	if(isRandom && (randReal() > rand)){
+		legalMoves = board.getLegalMoves(); num = legalMoves.size();
+		return legalMoves[randInt(num)];
+	}
 	switch(type){
 		case ALPHA_BETA:
+		case ALPHA_BETA_RAND:
 			result = alphaBeta(board, MINF, INF, 0, false);
 			if((num = result.moves.size()) == 0){ printf("alphaBeta returned empty moves!\n"); exit(1);}
 			return result.moves[randInt(num)];
-		case ALPHA_BETA_RAND:
-			if(randReal() > rand){
-				legalMoves = board.getLegalMoves(); num = legalMoves.size();
-				return legalMoves[randInt(num)];
-			}else{
-				result = alphaBeta(board, MINF, INF, 0, false);
-				if((num = result.moves.size()) == 0){ printf("alphaBeta returned empty moves!\n"); exit(1);}
-				return result.moves[randInt(num)];
-			}
+		case ALPHA_BETA_HIS:
+		case ALPHA_BETA_HIS_RAND:
+			/*
+
+
+
+
+
+
+			*/
+			break;
 		default:
 			printf("Failed at getBestMove:  no such agent type\n"); exit(1);
 	}
@@ -136,6 +147,7 @@ Agent::Agent(){
 
 Agent::Agent(const AgentType &which, char *readFileName = NULL, int depthL = 5, double ran = 0.7){
 	if((type = which) != PLAYER){
+		isRandom = (type == ALPHA_BETA_RAND || type == ALPHA_BETA_HIS_RAND)? true:false;
 		depthLimit = depthL; rand = ran;
 		setEvalNames(readFileName, readFileName);
 		getPriceTable();
@@ -145,6 +157,7 @@ Agent::Agent(const AgentType &which, char *readFileName = NULL, int depthL = 5, 
 
 Agent::Agent(const AgentType &which, char *readFileName, char *writeFileName, int depthL, double ran){
 	type = which; depthLimit = depthL; rand = ran;
+	isRandom = (type == ALPHA_BETA_RAND || type == ALPHA_BETA_HIS_RAND)? true:false;
 	setEvalNames(readFileName, writeFileName);
 	getPriceTable();
 	//if(type == PLAYER) std::bind(&Agent::playerGetMove, this, std::placeholders::_1);
