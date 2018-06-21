@@ -6,10 +6,9 @@ gameState儲存當前board的狀態
 Files:
   Othello.py: 最原始的遊戲
   Othello_learn.py: 純learn(沒有GUI) input: （repeat, depth, opponent file path, learner file path)
-  newOthello.py:最新的遊戲 input:（play: -1, depth, file path ; learn: repeat, depth, opponent file path, learner file path)
+  Othello_playmode.py:人對電腦 input:（play: depth, file path) 
   method.py: 不同種agents
-  eval.txt: train出的price_table
-  eval_old: 初始的price_table
+  eval: price table 的資料夾
   GUI.py: 協助C++繪圖
   input: 將此檔案重導向給Othello_learn.py 會讓先手使用eval_old.txt作為price_table，後手則是使用eval.txt(只有後手會learn)
 
