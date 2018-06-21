@@ -113,8 +113,8 @@ Square Agent::getBestMove(Board &board){
 			result = alphaBeta(board, MINF, INF, 0, false);
 			if((num = result.moves.size()) == 0){ printf("alphaBeta returned empty moves!\n"); exit(1);}
 			return result.moves[randInt(num)];
-		case ALPHA_BETA_HIS:
-		case ALPHA_BETA_HIS_RAND:
+		//case ALPHA_BETA_HIS:
+		//case ALPHA_BETA_HIS_RAND:
 			/*
 
 
@@ -123,7 +123,7 @@ Square Agent::getBestMove(Board &board){
 
 
 			*/
-			break;
+		//	break;
 		default:
 			printf("Failed at getBestMove:  no such agent type\n"); exit(1);
 	}
