@@ -6,6 +6,9 @@
 #include <sys/types.h>
 #include <signal.h>
 
+#ifdef WATCH_NODE
+unsigned long long int totalNodeSearched = 0ULL;
+#endif
 char buffer[66];
 int pipe_fd[2];
 char mes1[32] = "Failed to create pipe_fd: ",
@@ -61,7 +64,11 @@ int main(){
 		wT = readAgentType(); scanf("%s%d", whiteIn, &wDepth);
 		Agent b(bT, blackIn, bDepth, 1.0), w(wT, whiteIn, wDepth, 1.0);
 		b.print(); w.print();
-		playGame(b, w); kill(GUI_pid, 9);
+		playGame(b, w);
+		#ifdef WATCH_NODE
+		printf("total node searched %llu\n", totalNodeSearched);
+		#endif
+		kill(GUI_pid, 9);
 	}
 	exit(0);
 }

@@ -5,6 +5,9 @@
 char defaultFileName[5] = "eval";
 std::default_random_engine generator;
 char buf[32];
+#ifdef WATCH_NODE
+extern unsigned long long int nodeSearched, totalNodeSearched;
+#endif
 
 AgentType readAgentType(){
 	scanf("%s", buf);
@@ -46,61 +49,6 @@ void Agent::getPriceTable(){
 	fclose(fp);
 }
 
-
-/*sucInform Agent::alphaBetaHis(const Board &board, double alpha, double beta, const int &depth, bool warn){
-	sucInform ret;
-	if(depth == depthLimit){
-		ret.eval = evaluateBoard(board); return ret;
-	}
-	Board tempBoard(board); vector<Square> legalMoves = tempBoard.getLegalMoves();
-	if(legalMoves.empty()){
-		if(warn){
-			bitset<64> black = board.getAllBlack(), white = board.getAllWhite();
-			int bNum = black.count(), wNum = white.count();
-			if(bNum > wNum) ret.eval = INF-1;
-			else ret.eval = (bNum < wNum)? (MINF+1):(0.0);
-			return ret;
-		}else{
-			tempBoard.reverseTurn();
-			return alphaBeta(tempBoard, alpha, beta, depth, true);
-		}
-	}
-	int n=legalMoves.size(); sucInform childInform;
-	if(tempBoard.isBlacksTurn()){
-		double max = MINF;
-		for(int i=0;i<n;++i){
-			Board nextBoard(tempBoard); nextBoard.changeBoard(legalMoves[i]);
-			childInform = alphaBeta(nextBoard, alpha, beta, depth+1, false);
-			if(childInform.eval > max){
-				ret.eval = max = childInform.eval;
-				ret.moves.clear(); ret.moves.push_back(legalMoves[i]);
-			}else if(childInform.eval == max)
-				ret.moves.push_back(legalMoves[i]);
-			if(childInform.eval > alpha){
-				alpha =  childInform.eval;
-				if(beta <= alpha) break;
-			}
-		}
-	}else{
-		double min = INF;
-		for(int i=0;i<n;++i){
-			Board nextBoard(tempBoard); nextBoard.changeBoard(legalMoves[i]);
-			childInform = alphaBeta(nextBoard, alpha, beta, depth+1, false);
-			if(childInform.eval < min){
-				ret.eval = min = childInform.eval;
-				ret.moves.clear(); ret.moves.push_back(legalMoves[i]);
-			}else if(childInform.eval == min)
-				ret.moves.push_back(legalMoves[i]);
-			if(childInform.eval < beta){
-				beta = childInform.eval;
-				if(beta <= alpha) break;
-			}
-		}
-	}
-	return ret;
-}
-*/
-
 Square Agent::getBestMove(Board &board){
 	sucInform result; int num; vector<Square> legalMoves;
 	if(isRandom && (randReal() > rand)){
@@ -110,7 +58,14 @@ Square Agent::getBestMove(Board &board){
 	switch(type){
 		case ALPHA_BETA:
 		case ALPHA_BETA_RAND:
+			#ifdef WATCH_NODE
+			nodeSearched = 0ULL;
+			#endif
 			result = alphaBeta(board, MINF, INF, 0, false);
+			#ifdef WATCH_NODE
+			printf("nodeSearched = %llu\n", nodeSearched);
+			totalNodeSearched += nodeSearched;
+			#endif
 			if((num = result.moves.size()) == 0){ printf("alphaBeta returned empty moves!\n"); exit(1);}
 			return result.moves[randInt(num)];
 		//case ALPHA_BETA_HIS:

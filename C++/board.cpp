@@ -1,5 +1,23 @@
 #include "board.hpp"
 
+const Square iterateOrder[60] =
+#ifdef NA_ORDER
+	{S11 , S12, S13, S14, S15, S16, S17, S18,
+	S21, S22, S23, S24, S25, S26, S27, S28,
+	S31, S32, S33, S34, S35, S36, S37, S38,
+	S41, S42, S43,/* S44, S45,*/ S46, S47, S48,
+	S51, S52, S53,/* S54, S55,*/ S56, S57, S58,
+	S61, S62, S63, S64, S65, S66, S67, S68,
+	S71, S72, S73, S74, S75, S76, S77, S78,
+	S81, S82, S83, S84, S85, S86, S87, S88};
+#else
+	{S11, S18, S81, S88,//corners
+	S13, S16, S31, S33, S36, S38, S61, S63, S66, S68, S83, S86,//possible good squares
+	S14, S15, S41, S48, S51, S58, S84, S85,//edges
+	S23, S24, S25, S26, S32, S34, S35, S37, S42, S43, S46, S47, S52, S53, S56, S57, S62, S64, S65, S67, S73, S74, S75, S76,//normal squares
+	S12, S17, S21, S22, S27, S28, S71, S72, S77, S78, S82, S87};//possible bad squares
+#endif
+
 int Board::isWho(Square square)const{
 	return (occupied[square])? ((white[square])? 2: 1) : 0;
 }
@@ -124,8 +142,8 @@ vector<Direction> Board::canReverse(Square square){
 
 bool Board::haveLegalMove(){
 	vector<Direction> dirs;
-	for(int i=0;i<64;++i){
-		dirs = canReverse((Square)i);
+	for(int i=0;i<60;++i){
+		dirs = canReverse(iterateOrder[i]);
 		if(!dirs.empty()) return true;
 	}
 	return false;
@@ -133,9 +151,9 @@ bool Board::haveLegalMove(){
 
 vector<Square> Board::getLegalMoves(){
 	vector<Square> ret; vector<Direction> dirs;
-	for(int i=0;i<64;++i){
-		dirs = canReverse((Square)i);
-		if(!dirs.empty()) ret.push_back((Square)i);
+	for(int i=0;i<60;++i){
+		dirs = canReverse(iterateOrder[i]);
+		if(!dirs.empty()) ret.push_back(iterateOrder[i]);
 	}
 	return ret;
 }

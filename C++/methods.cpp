@@ -1,8 +1,14 @@
 #include "agent.hpp"
 
+#ifdef WATCH_NODE
+unsigned long long int nodeSearched = 0ULL;
+#endif
 
 sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const int &depth, bool warn){
 	sucInform ret;
+	#ifdef WATCH_NODE
+	++nodeSearched;
+	#endif
 	if(depth == depthLimit){
 		ret.eval = evaluateBoard(board); return ret;
 	}
@@ -15,6 +21,9 @@ sucInform Agent::alphaBeta(const Board &board, double alpha, double beta, const 
 			else ret.eval = (bNum < wNum)? (MINF+1):(0.0);
 			return ret;
 		}else{
+			#ifdef WATCH_NODE
+			--nodeSearched;
+			#endif
 			tempBoard.reverseTurn();
 			return alphaBeta(tempBoard, alpha, beta, depth, true);
 		}
