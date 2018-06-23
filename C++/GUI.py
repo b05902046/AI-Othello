@@ -86,16 +86,14 @@ while True:
 		for entry in range(64):
 			row, col = entry // 8 + 1, entry % 8 + 1
 			pygame.draw.circle(screen, COLOR[string[entry]], (25 + 50 * col, 25 + 50 * row), 15)
-			if entry == 1:
+			if string[entry] == 1:
 				black += 1
-			elif entry == 2:
+			elif string[entry] == 2:
 				white += 1
 		changeScore(black, white)
+		pygame.display.flip()
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			exit()
-
-
-
-	pygame.display.flip()
+	
 
