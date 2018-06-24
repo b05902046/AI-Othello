@@ -138,11 +138,9 @@ class game:
 				if learn == True:
 					#============for learning================#
 					if self.turn == 1:
-						pos = method.getAction(dice, self.price_table[0], self.origin_board, 1, limit_depth, "alpha")
-                                                self.bmoves.append((pos[0], pos[1]))
+						pos = method.getAction(dice, self.price_table[0], self.origin_board, 1, limit_depth, "minimax")
 					else:
-						pos = method.getAction(1, self.price_table[1], self.origin_board, 2, limit_depth, "alpha_rand")
-                                                self.wmoves.append((pos[0], pos[1]))
+						pos = method.getAction(1, self.price_table[1], self.origin_board, 2, limit_depth, "minimax")
 				else:
 					if self.get_turn() == 2:
 						#useless = raw_input().split()
@@ -327,27 +325,22 @@ class gameState:
 if __name__ == "__main__":
 	print "please enter: times to repeat, limit_depth, opponent's eval_file, learner's eval_file"
 	control = raw_input().split()
-	if int(control[0]) == -1:
-		print "play mode"
-		Game = game()
-		Game.handle(False)
-	else:
-		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
-		print "repeat times:", repeat, "depth:", limit_depth
-		print_or_not = False
-                tStart = time.time()
-		for i in range(0, repeat):
-			if i%10 == 0:
-				print i, "th times"
-			Game = game(control[2], control[3])
-			Game.handle(True)
-			if Game.get_winner() == 1:
-				black_wins += 1
-			else:
-				white_wins += 1
-		tEnd = time.time()
-		print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
-                print "Run time:", (tEnd - tStart), "secs\n"
+	black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
+	print "repeat times:", repeat, "depth:", limit_depth
+	print_or_not = False
+        tStart = time.time()
+	for i in range(0, repeat):
+		if i%10 == 0:
+			print i, "th times"
+                Game = game(control[2], control[3])
+		Game.handle(True)
+		if Game.get_winner() == 1:
+			black_wins += 1
+		else:
+			white_wins += 1
+	tEnd = time.time()
+	print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
+        print "Run time:", (tEnd - tStart), "secs\n"
 """
 while not done:
 	for event in pygame.event.get():

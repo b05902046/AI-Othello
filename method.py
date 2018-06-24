@@ -7,7 +7,7 @@ def naiive_get_best_move(currentState, myColor):
 			max, maxi, maxj = score, i, j
 	return [maxi, maxj]
 
-def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
+def min_max_get_best_move(priceTable, currentState, myColor, depth, limit_depth, warn):
 	#print "depth", depth, "myColor", myColor
 	#currentState.print_board()
 	if depth == limit_depth:
@@ -19,21 +19,21 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 		if len(moves) == 0:
 			nums = currentState.count_wb()
 			if nums[1] > nums[0]:
-				value = float('inf')
+				value = 810000
 			elif nums[1] < nums[0]:
-				value = float('-inf')
+				value = -810000
 			else:
 				value = 0
 			#print (depth, None, None, value)
 			return (None, None, value)
 	elif len(moves) == 0:
-		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, True)
+		return min_max_get_best_move(priceTable, currentState, (3-myColor), depth, limit_depth, True)
 	if myColor == 1:
 		#black
 		MAX, maxi, maxj = float('-inf'), None, None
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
-			new = min_max_get_best_move(priceTable, newState, 2, depth+1, False)
+			new = min_max_get_best_move(priceTable, newState, 2, depth+1, limit_depth, False)
 			if new[2] > MAX:
 				MAX, maxi, maxj = new[2], move[0], move[1]
 		#print "score", MAX
@@ -47,7 +47,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, warn):
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
 			#print "new"
 			#currentState.print_board()
-			new = min_max_get_best_move(priceTable, newState, 1, depth+1, False)
+			new = min_max_get_best_move(priceTable, newState, 1, depth+1, limit_depth, False)
 			if new[2] < MIN:
 				MIN, mini, minj = new[2], move[0], move[1]
 		#print "score", MIN
@@ -109,9 +109,9 @@ def alpha_beta(priceTable, currentState, myColor, depth, limit_depth, warn, alph
 def getAction(dice, price_table, gameState, myColor, depth_limit, method):
 	moves = gameState.get_legal_moves(myColor, False)
 	if method == "naiive":
-		pass
+		return naiive_get_best_move(gameState, myColor)
 	elif method == "minimax":
-		pass
+		return min_max_get_best_move(price_table, gameState, myColor, 1, depth_limit, False)
 	elif method == "alpha":
 		return alpha_beta(price_table, gameState, myColor, 1, depth_limit, False, float('-inf'), float('inf'))
 	elif method == "alpha_rand":
