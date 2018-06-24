@@ -58,7 +58,7 @@ def min_max_get_best_move(priceTable, currentState, myColor, depth, limit_depth,
 def alpha_beta(priceTable, currentState, myColor, depth, limit_depth, warn, alpha, beta):
 	if depth == limit_depth:
 		value = currentState.evaluate(priceTable)
-		return (None, None, value)
+		return [(None, None, value)]
 	moves = currentState.get_legal_moves(myColor, False)
 	if warn == True:
 		if len(moves) == 0:
@@ -70,41 +70,47 @@ def alpha_beta(priceTable, currentState, myColor, depth, limit_depth, warn, alph
 			else:
 				value = 0
 			#print (depth, None, None, value)
-			return (None, None, value)
+			return [(None, None, value)]
 	elif len(moves) == 0:
 		return alpha_beta(priceTable, currentState, (3-myColor), depth, limit_depth, True, alpha, beta)
 	if myColor == 1:
 		#black
-		MAX, maxi, maxj = float('-inf'), None, None
+		MAX, ret = float('-inf'), []
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
 			new = alpha_beta(priceTable, newState, 2, depth+1, limit_depth, False, alpha, beta)
-			if new[2] > MAX:
-				MAX, maxi, maxj = new[2], move[0], move[1]
+			value = new[0][2]
+			if value > MAX:
+				MAX, ret = value, [(move[0], move[1], value)]
+			elif value == MAX:
+				ret.append((move[0], move[1], value))
 			alpha = max(MAX, alpha)
 			if alpha > beta:
 				break
 		#print "score", MAX
 		#print "after"
 		#currentState.print_board()
-		return (maxi, maxj, MAX)
+		return ret
 	elif myColor == 2:
 		#white
-		MIN, mini, minj = float('inf'), None, None
+		MIN, ret = float('inf'), []
 		for move in moves:
 			newState = currentState.get_successor_state(myColor, move[0], move[1])
 			#print "new"
 			#currentState.print_board()
 			new = alpha_beta(priceTable, newState, 1, depth+1, limit_depth, False, alpha, beta)
-			if new[2] < MIN:
-				MIN, mini, minj = new[2], move[0], move[1]
+			value = new[0][2]
+			if value < MIN:
+				MIN, ret = value, [(move[0], move[1], value)]
+			elif value == MIN:
+				ret.append((move[0], move[1], value))
 			beta = min(MIN, beta)
 			if alpha > beta:
 				break
 		#print "score", MIN
 		#print "after 2"
 		#currentState.print_board()
-		return (mini, minj, MIN)
+		return ret
 
 def getAction(dice, price_table, gameState, myColor, depth_limit, method):
 	moves = gameState.get_legal_moves(myColor, False)
@@ -113,7 +119,9 @@ def getAction(dice, price_table, gameState, myColor, depth_limit, method):
 	elif method == "minimax":
 		return min_max_get_best_move(price_table, gameState, myColor, 1, depth_limit, False)
 	elif method == "alpha":
-		return alpha_beta(price_table, gameState, myColor, 1, depth_limit, False, float('-inf'), float('inf'))
+		alpha_beta(price_table, gameState, myColor, 1, depth_limit, False, float('-inf'), float('inf'))
+		who = random.randint(0, len(moves)-1)
+		return (moves[who][0], moves[who][1])		
 	elif method == "alpha_rand":
 		bestMove = alpha_beta(price_table, gameState, myColor, 1, depth_limit, False, float('-inf'), float('inf'))
 		if random.random() <= dice:
