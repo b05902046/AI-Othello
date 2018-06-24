@@ -2,6 +2,9 @@
 #include "agent.hpp"
 #include <mutex>
 #include <thread>
+#include <chrono>
+#include <iostream>
+using namespace std;
 using std::thread;
 using std::mutex;
 #define SIZE 32
@@ -46,7 +49,13 @@ int main(){
 	wT = readAgentType(); scanf("%s%d%u", whiteIn, &wDepth, &game);
 	Agent bAgent(bT, blackIn, bDepth, 1.0), wAgent(wT, whiteIn, wDepth, 1.0);
 	bWin = wWin = draw = 0U;
+	std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 	for(int k=0;k<THREAD_NUMBER;++k) threads[k] = thread(playGame, bAgent, wAgent, k);
 	for(int k=0;k<THREAD_NUMBER;++k) threads[k].join();
-	PRINT("bWin: %u  wWin: %u  draw: %u\n", bWin, wWin, draw); exit(0);
+	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+	PRINT("bWin: %u  wWin: %u  draw: %u\n", bWin, wWin, draw);
+	cout << "Run time: "
+		  << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
+		  << " ms\n";
+	exit(0);
 }
