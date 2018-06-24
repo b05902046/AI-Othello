@@ -1,5 +1,4 @@
 import time
-import pygame
 import method
 GREEN = (0, 153, 51)
 BLACK = (0, 0, 0)
@@ -9,58 +8,26 @@ BASE = 2#position of up-left corner
 #=======limits=======#
 limit_depth = 5
 dice = 0.8
-reward = 0.7
-print_or_not = False
+reward = 3
+print_or_not = True
 
 class game:
-	def __init__(self, pTable_B, pTable_W, graph = True):
-		self.screen = None
-		self.winner = 0
+	def __init__(self, opponent_file, learner_file):
 		self.done = False
 		self.turn = 1#black piece for 1, white piece for 2
-		if graph == True:
-#init screen
-			pygame.init()
-			self.screen = pygame.display.set_mode((500, 500))
-			self.screen.fill((237, 217, 177))
-			self.center = pygame.draw.rect(self.screen, GREEN, pygame.Rect(50, 50, 400, 400))
-#draw lines
-			for dist in range(50, 500, 50):
-				pygame.draw.line(self.screen, BLACK, [dist, 50], [dist, 450])
-				pygame.draw.line(self.screen, BLACK, [50, dist], [450, dist])
-
-#create index
-			self.font = pygame.font.Font(None, 30)
-			for num in range(0, 8):
-				index = chr(ord('a') + num)
-				self.text = self.font.render(str(num + 1), True, BLACK)
-				self.screen.blit(self.text, (70 + num * 50,20))
-				self.text = self.font.render(str(num + 1), True, BLACK)
-				self.screen.blit(self.text, (20, 70 + num * 50))
-#Scoreboard
-			pygame.draw.circle(self.screen, (0,0,0), (125,475), 15)
-			self.font = pygame.font.Font(None, 45)
-			self.text = self.font.render('2', True, BLACK)
-			self.screen.blit(self.text, (165, 462))
-			pygame.draw.circle(self.screen, WHITE, (325,475), 15)
-			self.text = self.font.render('2', True, BLACK)
-			self.screen.blit(self.text, (358, 462))
-	
-#pieces
-			pygame.draw.circle(self.screen, WHITE, (225, 225), 15)
-			pygame.draw.circle(self.screen, WHITE, (275, 275), 15)
-			pygame.draw.circle(self.screen, BLACK, (275, 225), 15)
-			pygame.draw.circle(self.screen, BLACK, (225, 275), 15)
-				
-			pygame.display.flip()
-#============board=============#
-
+#============board================#
 		self.origin_board = gameState()
 #============price_table==========#
-		self.price_table_B = self.read_price_table(pTable_B)
-		self.price_table_W = self.read_price_table(pTable_W)
-#=================================#
-
+		self.price_table = [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
+		self.price_table += [[[0, 0, 0, 0, 0, 0, 0, 0, 0] for x in range(9) ]]
+#============file_name============#
+		self.filename = [opponent_file] + [learner_file]
+		#print "opponent's filename ", self.filename[0]
+		#print "learner's filename = ", self.filename[1]
+#============move_records=========#
+		self.bmoves = []
+		self.wmoves = []
+		self.nobody = []
 	
 	def get_board(self):
 		return self.origin_board
@@ -74,26 +41,27 @@ class game:
 	def get_winner(self):
 		return self.winner
 
-	def get_price_table(self, which):
-		if which == 1:
-			return self.price_table_B
-		else:
-			return self.price_table_W
+	def get_price_table(self, myColor):
+		return self.price_table[myColor - 1]
 
 	def set_winner(self, black, white):
 		self.done = True
 		if black > white:
-			#if print_or_not == True:
-			print "Black Wins"
+			if print_or_not == True:
+				print "Black Wins"
 			self.winner = 1
 		elif white > black:
-			#if print_or_not == True:
-			print "White Wins"
+			if print_or_not == True:
+				print "White Wins"
 			self.winner = 2
 		else:
-			#if print_or_not == True:
-			print "Draw"
+			if print_or_not == True:
+				print "Draw"
 			self.winner = 0
+		for i in range(1, 9):
+			for j in range(1, 9):
+				if self.origin_board.occupation(i, j) == False:
+					self.nobody.append((i, j))
 
 	def set_done(self, param):
 		self.done = param
@@ -107,106 +75,112 @@ class game:
 		else:
 			self.set_turn(1)
 
-	def normalize_price_table(self):
+	def update_price_table(self, myColor):
+		winner = Game.get_winner()
+		if winner == 1:
+			for move in self.bmoves:
+				self.price_table[myColor - 1][move[0]][move[1]] += 2*reward
+			for move in self.nobody:
+				self.price_table[myColor - 1][move[0]][move[1]] += reward		
+		elif winner == 2:
+			for move in self.wmoves:
+				self.price_table[myColor - 1][move[0]][move[1]] += 2*reward
+			for move in self.nobody:
+				self.price_table[myColor - 1][move[0]][move[1]] += reward
+
+	def normalize_price_table(self, myColor):
 		summ = 0
 		for i in range(1, 9):
-			summ += sum(self.price_table[i])
+			summ += sum(self.price_table[myColor - 1][i])
 		summ /= 64
 		for i in range(1, 9):
 			for j in range(1, 9):
-				self.price_table[i][j] /= summ
+				self.price_table[myColor - 1][i][j] /= summ
 
-	def read_price_table(self, path):
-		f = open(path, "r")
-		price_table = [ [0, 0, 0, 0, 0, 0, 0, 0, 0] for row in range(0, 9)]
+	def read_price_table(self, myColor):
+		f = open(self.filename[myColor - 1], "r")
 		temp = f.read().split()
 		for i in range(1, 9):
 			for j in range(1, 9):
-				price_table[i][j] = float(temp[(i - 1)*8 + (j - 1)])
+				self.price_table[myColor - 1][i][j] = float(temp[(i - 1)*8 + (j - 1)])
 		f.close()
-		return price_table
 
-	def write_price_table(self, price_table):
-		f = open(path, "w+")
+	def write_price_table(self, myColor):
+		#print "writing to ", self.filename[myColor - 1]
+		f = open(self.filename[myColor - 1], "w+")
 		for i in range(1, 9):
 			for j in range(1, 9):
-				f.write(str(self.price_table[i][j]) + ' ')
+				f.write(str(self.price_table[myColor - 1][i][j]) + ' ')
 			f.write('\n')
 		f.close()
 	
-	
+	"""
 	def changeScore(self, font, black, white):#score of black
-	#remove old score
-		pygame.draw.rect(self.screen, BROWN, pygame.Rect(352, 452, 45, 45))
-		pygame.draw.rect(self.screen, BROWN, pygame.Rect(152, 452, 45, 45))
-
-	#set new score
-		self.text = font.render(str(black), True, BLACK)
-		if black >= 10:
-			self.screen.blit(self.text, (158, 462))
-		else:
-			self.screen.blit(self.text, (165, 462))
-		self.text = font.render(str(white), True, BLACK)
-		if white >= 10:
-			self.screen.blit(self.text, (358, 462))
-		else:
-			self.screen.blit(self.text, (365, 462))
 		return black + white
-
-	def handle(self):
+	"""
+	def handle(self, learn):
 		while not self.get_done():
-			if graph == True:
-				for event in pygame.event.get():
-					if event.type == pygame.QUIT:
-						self.set_done(True)
 			success = False
+			self.read_price_table(1)
+			self.read_price_table(2)
 			if self.origin_board.haveMove(self.turn) == -1:
 				self.next_turn()
 				if self.origin_board.haveMove(self.turn) == -1:
 					#game ends
 					white, black = self.origin_board.count_wb()
-					if graph == True:
-						pygame.display.flip()
 					self.set_winner(black, white)
+			        	#raw_input()
 					success = True
 					self.set_done(True)
 
-
 			while not success:
 				pos = None
+				if learn == True:
 					#============for learning================#
-				if self.turn == 1:
-					pos = method.getAction(dice, self.price_table_B, self.origin_board, self.turn, limit_depth, "alpha")
+					if self.turn == 1:
+						pos = method.getAction(dice, self.price_table[0], self.origin_board, 1, limit_depth, "alpha")
+                                                self.bmoves.append((pos[0], pos[1]))
+					else:
+						pos = method.getAction(1, self.price_table[1], self.origin_board, 2, limit_depth, "alpha_rand")
+                                                self.wmoves.append((pos[0], pos[1]))
 				else:
-					pos = method.getAction(dice, self.price_table_W, self.origin_board, self.turn, limit_depth, "alpha")
-				#time.sleep(0.5)
-
+					if self.get_turn() == 2:
+						#useless = raw_input().split()
+						if print_or_not == True:
+							print "Computer's turn"
+							pos = method.getAction(dice, self.price_table[self.turn - 1], self.origin_board, 2, limit_depth, "alpha_rand")
+						if print_or_not == True:
+							print "AI chose", pos
+						#time.sleep(0.5)
+					else:
+						pos = raw_input().split()
+						try:
+							pos[0], pos[1] = int(pos[0]), int(pos[1])
+						except:
+							print "Wrong input format"
+							continue
 				if pos[0] > 8 or pos[0] < 1 or pos[1] > 8 or pos[1] < 1 or self.origin_board.occupation(pos[0], pos[1]):#position occupied or out of range
 					print "illegal move"
 				else:
 					if print_or_not == True:
 						print "turn", self.get_turn()
-					result = self.origin_board.check(pos[0], pos[1], self.get_turn(), 0, self.screen)
+					result = self.origin_board.check(pos[0], pos[1], self.get_turn(), 0)
 					#self.origin_board.print_board()
 					if result > 0:
 						white, black = self.origin_board.count_wb()
 						total = black + white
-						if graph == True:
-							self.changeScore(self.font, black, white)
 						success = True
 						self.next_turn()
 						if print_or_not == True:
 							self.origin_board.print_board()
 						if total == 64:
 							self.set_winner(black, white)
-							if graph == True:
-								pygame.display.flip()
 							#raw_input()
 
 					else:
 						print "illegal move"
-			if graph == True:
-				pygame.display.flip()
+
+
 
 X = [1, 1, 0, -1, -1, -1, 0, 1]
 Y = [0, -1, -1, -1, 0, 1, 1, 1]
@@ -246,7 +220,7 @@ class gameState:
 			return True
 		return False
 
-	def changePiece_s(self, xfrom, xto, yfrom, yto, color, screen = None):
+	def changePiece_s(self, xfrom, xto, yfrom, yto, color):
 		piece = 1
 		if color == COLOR[2]:
 			piece = 2
@@ -263,11 +237,8 @@ class gameState:
 				self.board[x][y] = piece
 				#print "changes", x, y, "to", piece
 				#print_board
-				if screen != None:
-					pygame.draw.rect(screen, GREEN, pygame.Rect(BASE + y * 50, BASE + x * 50, 45 , 45))
-					pygame.draw.circle(screen, color, (27 + y * 50, 27 + x * 50), 15)
-
-	def changePiece_d(self, xfrom, xto, yfrom, yto, color, screen = None):
+				
+	def changePiece_d(self, xfrom, xto, yfrom, yto, color):
 		y = 1
 		piece = 1
 		if color == COLOR[2]:
@@ -285,12 +256,9 @@ class gameState:
 			self.board[x][yfrom] = piece
 			#print "changes", x, yfrom, "to", piece
 			#print_board
-			if screen != None:
-				pygame.draw.rect(screen, GREEN, pygame.Rect(BASE + yfrom * 50, BASE + x * 50, 45, 45))
-				pygame.draw.circle(screen, color, (27 + yfrom * 50, 27 + x * 50), 15)
 			yfrom += y
 
-	def check(self, x, y, myColor, check, screen = None):#coordinates
+	def check(self, x, y, myColor, check):#coordinates
 		ret = 0
 		for cnt in range(8):
 			tmpx, tmpy, add = x, y, 0
@@ -306,9 +274,9 @@ class gameState:
 					ret += add
 					if check == 0:
 						if cnt == 1 or cnt == 3 or cnt == 5 or cnt == 7:
-							self.changePiece_d(x, tmpx, y, tmpy, COLOR[myColor], screen)
+							self.changePiece_d(x, tmpx, y, tmpy, COLOR[myColor])
 						else:
-							self.changePiece_s(x, tmpx, y, tmpy, COLOR[myColor], screen)
+							self.changePiece_s(x, tmpx, y, tmpy, COLOR[myColor])
 					done = True
 				else:
 					if self.board[tmpx][tmpy] == 0:
@@ -357,26 +325,30 @@ class gameState:
 
 
 if __name__ == "__main__":
-	control = raw_input("repeat, depth, black table, white table2\n").split()
-	black_wins, white_wins = 0, 0
-	repeat, limit_depth, table_B, table_W = int(control[0]), int(control[1]), control[2], control[3]
-	graph = True
-	if control[4] == "n":
-		graph = False
-        tStart = time.time()
-	for i in range(0, repeat):
-		if i%10 == 0:
-			print i, "th times"
-		Game = game(table_B, table_W, graph)
-		Game.handle()
-		winner = Game.get_winner()
-		if winner == 1:
-			black_wins += 1
-		elif winner == 2:
-			white_wins += 1
-        tEnd = time.time()
-	print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
-        print "Run time:", (tEnd - tStart), "secs\n"
+	print "please enter: times to repeat, limit_depth, opponent's eval_file, learner's eval_file"
+	control = raw_input().split()
+	if int(control[0]) == -1:
+		print "play mode"
+		Game = game()
+		Game.handle(False)
+	else:
+		black_wins, white_wins, repeat, limit_depth = 0, 0, int(control[0]), int(control[1])
+		print "learn mode\nrepeat times:", repeat, "depth:", limit_depth
+		print_or_not = False
+		for i in range(0, repeat):
+			if i%10 == 0:
+				print i, "th times"
+			Game = game(control[2], control[3])
+			Game.handle(True)
+			Game.update_price_table(2)
+			Game.normalize_price_table(2)
+			Game.write_price_table(2)
+			if Game.get_winner() == 1:
+				black_wins += 1
+			else:
+				white_wins += 1
+			
+		print "black:", black_wins, "white:", white_wins, "ties:", (repeat - black_wins - white_wins)
 """
 while not done:
 	for event in pygame.event.get():
